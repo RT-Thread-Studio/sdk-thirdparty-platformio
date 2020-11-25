@@ -1,0 +1,17 @@
+{
+  "name": "contrib-pysite",
+  "version": "2.37.191020",
+  "description": "Extra Python package for PlatformIO Core",
+  "keywords": [
+    "platformio",
+    "platformio-core"
+  ],
+  "homepage": "https://docs.platformio.org/page/core/index.html",
+  "system": [
+    "windows_amd64"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/platformio/platformio-core"
+  }
+}

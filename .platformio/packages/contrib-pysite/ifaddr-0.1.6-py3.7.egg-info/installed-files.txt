@@ -1,0 +1,9 @@
+..\ifaddr\__init__.py
+..\ifaddr\_posix.py
+..\ifaddr\_shared.py
+..\ifaddr\_win32.py
+..\ifaddr\test_ifaddr.py
+PKG-INFO
+SOURCES.txt
+dependency_links.txt
+top_level.txt
