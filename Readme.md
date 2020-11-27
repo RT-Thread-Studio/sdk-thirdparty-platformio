@@ -20,3 +20,23 @@ post_install.bat 的执行方式为 cmd + rt-studio version number
 ./post_install.bat 2.0.0
 ```
 
+###  4. 内置的 package 列表
+
++ cmsis-stm32f0
++ cmsis-stm32f1
++ cmsis-stm32f2
++ cmsis-stm32f4
++ cmsis-stm32f7
++ cmsis-stm32h7
++ cmsis-stm32l4
++ libopencm3
++ arduinoststm32
++ stm32cube
++ openocd
++ scons
++ gcc
++ mbed
+
+###  5. 内置的 platform 列表
+
++ ststm32
