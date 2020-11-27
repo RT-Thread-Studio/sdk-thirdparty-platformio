@@ -16,7 +16,6 @@ class PlatformioBuilder(object):
         elif __file__:
             dir_path = os.path.dirname(__file__)
         self.current_folder = Path(dir_path)
-        print(self.current_folder)
         self.home_path = Path.home()
         self.platformio_path = self.home_path.joinpath(".platformio")
         self.python_path = self.current_folder.joinpath("python377x64/python.exe")
@@ -68,11 +67,11 @@ class PlatformioBuilder(object):
                 shutil.copy(self.long_path_enable(src_item_path), self.long_path_enable(dst_item_path))
 
     def copy_platformio_packages(self):
+        print("************* Copy and install platformio packages (Step 1/2) ***************")
         if not self.platformio_path.exists():
             os.makedirs(self.long_path_enable(self.platformio_path))
             self.cp_fr_list([".platformio"], self.current_folder, self.home_path)
         else:
-            print("update platformio")
             self.cp_fr_list(os.listdir(self.current_folder.joinpath(".platformio/packages")),
                             self.current_folder.joinpath(".platformio/packages"),
                             self.platformio_path.joinpath("packages"))
@@ -90,15 +89,23 @@ class PlatformioBuilder(object):
                 shutil.rmtree(self.long_path_enable(self.platformio_path.joinpath("penv")))
             else:
                 os.remove(self.long_path_enable(self.platformio_path.joinpath("penv")))
-            print("done")
 
     def install_platformio(self):
+        print("************* Create platformio environment (Step 2/2) ***************")
         os.system(str(self.python_path.as_posix()) + " " + str(self.get_platformio_script_path.as_posix()))
+        print("************* Done ***************")
 
     def make_platformio(self):
         self.copy_platformio_packages()
         self.install_platformio()
-
-
-builder = PlatformioBuilder()
-builder.make_platformio()
+if len(sys.argv)>1:
+    rt_studio_version = sys.argv[1]
+    print("rt_studio_version: "+str(rt_studio_version))
+    if rt_studio_version > "2.0.0":
+        builder = PlatformioBuilder()
+        builder.make_platformio()
+    else:
+        print("RT-Thread Studio version is not match")
+else:
+    print("Info:")
+    print("Please add RT-Thread Studio version number as parameter")

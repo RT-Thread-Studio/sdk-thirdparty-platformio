@@ -1,6 +1,6 @@
 ---
 yaml_version: 1
-pkg_version: 1.0.0
+pkg_version: 5.0.3
 pkg_vendor: RealThread
 pkg_type: ThridParty_Support_Packages
 name: PlatformIO
