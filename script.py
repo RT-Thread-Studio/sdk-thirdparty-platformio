@@ -101,7 +101,7 @@ class PlatformioBuilder(object):
 if len(sys.argv)>1:
     rt_studio_version = sys.argv[1]
     print("rt_studio_version: "+str(rt_studio_version))
-    if rt_studio_version > "2.0.0":
+    if rt_studio_version >= "2.0.0":
         builder = PlatformioBuilder()
         builder.make_platformio()
     else:
