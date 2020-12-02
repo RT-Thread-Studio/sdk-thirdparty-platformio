@@ -20,6 +20,20 @@ class PlatformioBuilder(object):
         self.platformio_path = self.home_path.joinpath(".platformio")
         self.python_path = self.current_folder.joinpath("python377x64/python.exe")
         self.get_platformio_script_path = self.current_folder.joinpath("python377x64/get-platformio.py")
+        self.is_pip_config_exists = False
+        self.pip_config_dir_path = self.home_path.joinpath("pip")
+        if self.home_path.joinpath("pip/pip.ini").exists():
+            self.is_pip_config_exists = True
+
+    def modify_pip_source(self):
+        if self.is_pip_config_exists:
+            shutil.move(str(self.home_path.joinpath("pip/pip.ini")), str(self.home_path.joinpath("pip/pip.ini.backup")))
+        self.cp_fr_list(["pip.ini"], self.current_folder, self.pip_config_dir_path)
+
+    def recover_pip_source(self):
+        os.remove(self.pip_config_dir_path.joinpath("pip.ini"))
+        if self.is_pip_config_exists:
+            shutil.move(str(self.home_path.joinpath("pip/pip.ini.backup")), str(self.home_path.joinpath("pip/pip.ini")))
 
     def rm_fr_list(self, item_list, dst_path):
         for item_path in item_list:
@@ -79,7 +93,6 @@ class PlatformioBuilder(object):
                             self.current_folder.joinpath(".platformio/platforms"),
                             self.platformio_path.joinpath("platforms"))
             print(self.current_folder.joinpath(".platformio"))
-            print(os.listdir(self.current_folder.joinpath(".platformio")))
             other_file_and_folders = os.listdir(self.current_folder.joinpath(".platformio"))
             other_file_and_folders.remove("platforms")
             other_file_and_folders.remove("packages")
@@ -98,14 +111,25 @@ class PlatformioBuilder(object):
     def make_platformio(self):
         self.copy_platformio_packages()
         self.install_platformio()
-if len(sys.argv)>1:
+
+
+if len(sys.argv) > 2:
     rt_studio_version = sys.argv[1]
-    print("rt_studio_version: "+str(rt_studio_version))
+    if "global" in str(sys.argv[2]).lower():
+        is_studio_global_version = True
+    else:
+        is_studio_global_version = False
+    print("rt_studio_version: " + str(rt_studio_version))
     if rt_studio_version >= "2.0.0":
-        builder = PlatformioBuilder()
-        builder.make_platformio()
+        if is_studio_global_version:
+            builder = PlatformioBuilder()
+            builder.make_platformio()
+        else:
+            builder = PlatformioBuilder()
+            builder.modify_pip_source()
+            builder.make_platformio()
+            builder.recover_pip_source()
     else:
         print("RT-Thread Studio version is not match")
 else:
-    print("Info:")
-    print("Please add RT-Thread Studio version number as parameter")
+    print("Info:Please add RT-Thread Studio version number as parameter")
