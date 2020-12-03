@@ -114,6 +114,7 @@ class PlatformioBuilder(object):
 
 
 if len(sys.argv) > 2:
+    builder = PlatformioBuilder()
     rt_studio_version = sys.argv[1]
     if "global" in str(sys.argv[2]).lower():
         is_studio_global_version = True
@@ -121,8 +122,21 @@ if len(sys.argv) > 2:
         is_studio_global_version = False
     print("rt_studio_version: " + str(rt_studio_version))
     if rt_studio_version >= "2.0.0":
+        result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
+        if "1" in result.read().strip().split(" ")[-1]:
+            print("Long path support has enabled")
+        else:        
+            print("Long path support has not enabled")
+            print("Enable windows long path support...")
+            bat_path = builder.current_folder.joinpath("longpathenable.bat").as_posix()
+            os.system(str(bat_path))
+            result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
+            if "1" in result.read().strip().split(" ")[-1]:
+                print("Long path support has enabled")
+            else:
+                print("Enable long path support fail.")
+                sys.exit(1)
         if is_studio_global_version:
-            builder = PlatformioBuilder()
             builder.make_platformio()
         else:
             builder = PlatformioBuilder()
