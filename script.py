@@ -1,8 +1,8 @@
 import os
+import platform
 import shutil
 import sys
 from pathlib import Path
-import platform
 
 
 class PlatformioBuilder(object):
@@ -93,7 +93,6 @@ class PlatformioBuilder(object):
             self.cp_fr_list(os.listdir(self.current_folder.joinpath(".platformio/platforms")),
                             self.current_folder.joinpath(".platformio/platforms"),
                             self.platformio_path.joinpath("platforms"))
-            print(self.current_folder.joinpath(".platformio"))
             other_file_and_folders = os.listdir(self.current_folder.joinpath(".platformio"))
             other_file_and_folders.remove("platforms")
             other_file_and_folders.remove("packages")
@@ -127,23 +126,25 @@ if len(sys.argv) > 2:
         is_studio_global_version = False
     print("rt_studio_version: " + str(rt_studio_version))
     if rt_studio_version >= "2.0.0":
-        if platform.release()>="10":
-            result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
+        if platform.release() >= "10":
+            result = os.popen(
+                """reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
             if "1" in result.read().strip().split(" ")[-1]:
                 print("Long path support has enabled")
-            else:        
+            else:
                 print("Long path support has not enabled")
                 print("Enable windows long path support...")
                 bat_path = builder.current_folder.joinpath("longpathenable.bat").as_posix()
                 os.system(str(bat_path))
-                result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
+                result = os.popen(
+                    """reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
                 if "1" in result.read().strip().split(" ")[-1]:
                     print("Long path support has enabled")
                 else:
                     print("Enable long path support fail.")
                     sys.exit(1)
         else:
-            print("Current windows os version is lower than 10, skip enable long path support")
+            print("Current windows os version is lower than windows 10, skip enable long path support")
         if is_studio_global_version:
             builder.make_platformio()
         else:
