@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
+import platform
 
 
 class PlatformioBuilder(object):
@@ -18,8 +19,8 @@ class PlatformioBuilder(object):
         self.current_folder = Path(dir_path)
         self.home_path = Path.home()
         self.platformio_path = self.home_path.joinpath(".platformio")
-        self.python_path = self.current_folder.joinpath("python377x64/python.exe")
-        self.get_platformio_script_path = self.current_folder.joinpath("python377x64/get-platformio.py")
+        self.python_path = self.platformio_path.joinpath(".rt_studio/python377x64/python.exe")
+        self.get_platformio_script_path = self.platformio_path.joinpath(".rt_studio/python377x64/get-platformio.py")
         self.is_pip_config_exists = False
         self.pip_config_dir_path = self.home_path.joinpath("pip")
         if self.home_path.joinpath("pip/pip.ini").exists():
@@ -103,6 +104,9 @@ class PlatformioBuilder(object):
             else:
                 os.remove(self.long_path_enable(self.platformio_path.joinpath("penv")))
 
+    def copy_portble_python(self):
+        self.cp_fr_list(['python377x64'], self.current_folder, self.platformio_path.joinpath(".rt_studio"))
+
     def install_platformio(self):
         print("************* Create platformio environment (Step 2/2) ***************")
         os.system(str(self.python_path.as_posix()) + " " + str(self.get_platformio_script_path.as_posix()))
@@ -110,6 +114,7 @@ class PlatformioBuilder(object):
 
     def make_platformio(self):
         self.copy_platformio_packages()
+        self.copy_portble_python()
         self.install_platformio()
 
 
@@ -122,24 +127,26 @@ if len(sys.argv) > 2:
         is_studio_global_version = False
     print("rt_studio_version: " + str(rt_studio_version))
     if rt_studio_version >= "2.0.0":
-        result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
-        if "1" in result.read().strip().split(" ")[-1]:
-            print("Long path support has enabled")
-        else:        
-            print("Long path support has not enabled")
-            print("Enable windows long path support...")
-            bat_path = builder.current_folder.joinpath("longpathenable.bat").as_posix()
-            os.system(str(bat_path))
+        if platform.release()>="10":
             result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
             if "1" in result.read().strip().split(" ")[-1]:
                 print("Long path support has enabled")
-            else:
-                print("Enable long path support fail.")
-                sys.exit(1)
+            else:        
+                print("Long path support has not enabled")
+                print("Enable windows long path support...")
+                bat_path = builder.current_folder.joinpath("longpathenable.bat").as_posix()
+                os.system(str(bat_path))
+                result = os.popen("""reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
+                if "1" in result.read().strip().split(" ")[-1]:
+                    print("Long path support has enabled")
+                else:
+                    print("Enable long path support fail.")
+                    sys.exit(1)
+        else:
+            print("Current windows os version is lower than 10, skip enable long path support")
         if is_studio_global_version:
             builder.make_platformio()
         else:
-            builder = PlatformioBuilder()
             builder.modify_pip_source()
             builder.make_platformio()
             builder.recover_pip_source()
