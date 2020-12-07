@@ -126,7 +126,7 @@ if len(sys.argv) > 2:
         is_studio_global_version = False
     print("rt_studio_version: " + str(rt_studio_version))
     if rt_studio_version >= "2.0.0":
-        if platform.release() >= "10":
+        if int(platform.release()) >= int("10"):
             result = os.popen(
                 """reg query HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\FileSystem /v LongPathsEnabled""")
             if "1" in result.read().strip().split(" ")[-1]:
