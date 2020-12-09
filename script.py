@@ -106,6 +106,9 @@ class PlatformioBuilder(object):
                 shutil.rmtree(self.long_path_enable(self.platformio_path.joinpath("penv")))
             else:
                 os.remove(self.long_path_enable(self.platformio_path.joinpath("penv")))
+        self.cp_fr_list(["pip.conf"], self.current_folder.joinpath(".platformio/penv"),
+                            self.platformio_path.joinpath("penv"))
+
 
     def copy_portble_python(self):
         print("Copying python environment...", flush=True)
@@ -113,7 +116,7 @@ class PlatformioBuilder(object):
 
     def install_platformio(self):
         print("************* Create platformio environment (Step 2/2) ***************", flush=True)
-        os.system(str(self.python_path.as_posix()) + " " + str(self.get_platformio_script_path.as_posix()))
+        os.system(str(self.python_path.as_posix()) + " " + "-m pioinstaller")
         print("************* Done ***************", flush=True)
 
     def make_platformio(self):
@@ -151,8 +154,12 @@ if len(sys.argv) > 2:
         else:
             print("Current windows os version is lower than windows 10, skip enable long path support", flush=True)
         if is_studio_global_version:
+            if not builder.current_folder.joinpath("python377x64/.rt_global").exists():
+                os.makedirs(builder.current_folder.joinpath("python377x64/.rt_global"))
             builder.make_platformio()
         else:
+            if builder.current_folder.joinpath("python377x64/.rt_global").exists():
+                shutil.rmtree(builder.current_folder.joinpath("python377x64/.rt_global"))
             builder.modify_pip_source()
             builder.make_platformio()
             builder.recover_pip_source()
