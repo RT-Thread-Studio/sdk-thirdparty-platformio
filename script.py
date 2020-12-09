@@ -106,8 +106,6 @@ class PlatformioBuilder(object):
                 shutil.rmtree(self.long_path_enable(self.platformio_path.joinpath("penv")))
             else:
                 os.remove(self.long_path_enable(self.platformio_path.joinpath("penv")))
-        self.cp_fr_list(["pip.conf"], self.current_folder.joinpath(".platformio/penv"),
-                            self.platformio_path.joinpath("penv"))
 
 
     def copy_portble_python(self):

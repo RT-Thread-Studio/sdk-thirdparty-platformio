@@ -1,6 +1,6 @@
 ---
 yaml_version: 1
-pkg_version: 5.0.3.11
+pkg_version: 5.0.3.12
 pkg_vendor: RealThread
 pkg_type: ThirdParty_Support_Packages
 name: PlatformIO
